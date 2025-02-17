@@ -12,6 +12,7 @@ function App() {
   const [selectedFilter, setSelectedFilter] = useState("");
   const [isSearch, setIsSearch] = useState(false);
   const [searchText, setSearchText] = useState("");
+  const [customDate, setCustomDate] = useState("");
 
   useEffect(() => {
     const data = localStorage.getItem('todos');
@@ -44,7 +45,10 @@ function App() {
     ));
   };
 
-  const applyFilter = (filter) => {
+  const applyFilter = (filter, custom= "") => {
+    if (filter === "custom") {
+      setCustomDate(custom);
+    }
     setSelectedFilter(filter);
     setIsFilteredOpen(false);
     setIsSettingsOpen(false);
@@ -54,7 +58,7 @@ function App() {
     setSelectedFilter("");
   };
 
-  // **Dynamic Search & Filter Logic**
+
   const filteredTodos = todos.filter(todo => {
     const matchesSearch = searchText
       ? todo.text.toLowerCase().includes(searchText.toLowerCase())
@@ -74,6 +78,7 @@ function App() {
       })(),
       month: todoDate.getFullYear() === today.getFullYear() && todoDate.getMonth() === today.getMonth(),
       year: todoDate.getFullYear() === today.getFullYear(),
+      custom: customDate ? todoDate.toDateString() === new Date(customDate).toDateString() : false
     }[selectedFilter] ?? true;
 
     return matchesSearch && matchesFilter;
@@ -162,6 +167,15 @@ function App() {
             <p className="cursor-pointer px-2 py-2 hover:bg-gray-100 rounded-md" onClick={() => applyFilter("year")}>
               This Year
             </p>
+
+            <hr className="border-gray-300 my-2" />
+            <p className="font-medium mb-1">Custom Date:</p>
+            <input
+              type="date"
+              className="w-full p-2 border rounded-md cursor-pointer"
+              value={selectedFilter === "custom" ? searchText : ""}
+              onChange={(e) => applyFilter("custom", e.target.value)}
+            />
           </div>
         )}
 
